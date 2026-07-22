@@ -1,4 +1,4 @@
-import random 
+import random
 import pandas as pd
 from faker import Faker
 from unidecode import unidecode
@@ -21,7 +21,7 @@ locales = [
     "no_NO",
 ]
 
-# dictionary to map ISO Alpha-2 to ISO  Alpha-3
+# dictionary to map ISO Alpha-2 to ISO Alpha-3
 countries = {
     "DE": "DEU",
     "AT": "AUT",
@@ -35,6 +35,7 @@ countries = {
     "SE": "SWE",
     "NO": "NOR",
 }
+
 
 def generate_dummy_data(locale: str) -> tuple:
     """
@@ -78,7 +79,7 @@ for _ in range(10):
 
 # creating DataFrames to store results as .csv file
 people_df = pd.DataFrame(people_data, columns=headers)
-address_df = pd.DataFrame(extra_addresses, columns=["address", 'country'])
+address_df = pd.DataFrame(extra_addresses, columns=["address", "country"])
 
 people_df.to_csv("people.csv", index=False)
 address_df.to_csv("address.csv", index=False)
