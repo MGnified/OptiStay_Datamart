@@ -100,17 +100,17 @@ for _ in range(10):
 
     street = fake.street_name()
     building_number = fake.building_number()
-    city = fake.city()
     postal_code = fake.postcode()
+    city = fake.city()
     country = countries[fake.current_country_code()]
 
-    extra_addresses.append((street, building_number, country))
+    extra_addresses.append((street, building_number, postal_code, city, country))
 
 # creating DataFrames to store results as .csv file
 people_df = pd.DataFrame(people_data, columns=headers)
 address_df = pd.DataFrame(
     extra_addresses,
-    columns=["street", "building_number", "city", "postal_code", "country"],
+    columns=["street", "building_number", "postal_code", "city", "country"],
 )
 
 people_df.to_csv("people.csv", index=False)
