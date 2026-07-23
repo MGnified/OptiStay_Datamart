@@ -1,4 +1,5 @@
 import random
+
 import pandas as pd
 from faker import Faker
 from unidecode import unidecode
@@ -36,6 +37,22 @@ countries = {
     "NO": "NOR",
 }
 
+# dictionary for country dial codes
+dial_codes = {
+    "DE": "+49",
+    "AT": "+43",
+    "CH": "+41",
+    "FR": "+33",
+    "GB": "+44",
+    "IT": "+39",
+    "DK": "+45",
+    "ES": "+34",
+    "NL": "+31",
+    "SE": "+46",
+    "NO": "+47",
+}
+
+
 
 def generate_dummy_data(locale: str) -> tuple:
     """
@@ -53,10 +70,11 @@ def generate_dummy_data(locale: str) -> tuple:
     first_name = fake.first_name()
     last_name = fake.last_name()
 
-    # creating email details
+    # creating contact details
     email_first = unidecode(first_name.lower()).replace(" ", "")
     email_last = unidecode(last_name.lower()).replace(" ", "")
     email = f"{email_first}.{email_last}@{fake.free_email_domain()}"
+    phone = f'{dial_codes[fake.current_country_code()]} {fake.numerify('%########')}'
 
     # creating address details
     street = fake.street_name()
@@ -69,6 +87,7 @@ def generate_dummy_data(locale: str) -> tuple:
         first_name,
         last_name,
         email,
+        phone,
         street,
         building_number,
         city,
@@ -77,12 +96,13 @@ def generate_dummy_data(locale: str) -> tuple:
     )
 
 
-# defining people data
+# generating people/user data
 people_data = []
 headers = [
     "first_name",
     "last_name",
     "email",
+    "phone",
     "street",
     "building_number",
     "city",
