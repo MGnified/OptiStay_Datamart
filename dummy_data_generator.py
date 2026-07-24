@@ -74,7 +74,7 @@ def generate_dummy_data(locale: str) -> tuple:
     email_first = unidecode(first_name.lower()).replace(" ", "")
     email_last = unidecode(last_name.lower()).replace(" ", "")
     email = f"{email_first}.{email_last}@{fake.free_email_domain()}"
-    phone = f'{dial_codes[fake.current_country_code()]} {fake.numerify('%########')}'
+    phone = f'{dial_codes[fake.current_country_code()]} {fake.numerify('########')}'
 
     # creating address details
     street = fake.street_name()
