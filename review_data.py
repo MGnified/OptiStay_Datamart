@@ -30,6 +30,7 @@ def generate_review(rating: int):
 
 rating = random.randint(0, 5)
 
-with open ()
+with open(r"data\reviews.txt", "w") as review:
     for _ in range(20):
-        (generate_review(random.randint(0, 5)))
+        review.write(str(generate_review(random.randint(0, 5))))
+        review.write(f"\n {'=' * 40} \n")
