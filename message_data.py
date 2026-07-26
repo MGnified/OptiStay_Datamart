@@ -1,6 +1,5 @@
 import random
 from faker import Faker
-from pathlib import Path
 
 faker = Faker()
 

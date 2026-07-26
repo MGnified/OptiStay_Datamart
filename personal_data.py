@@ -1,6 +1,5 @@
 import random
 
-import pandas as pd
 from faker import Faker
 from unidecode import unidecode
 
