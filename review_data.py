@@ -7,7 +7,8 @@ pos_feedback: list = [
     "Definitely coming again!",
 ]
 
-feedback: list = ["Stay was okay.", "No complaints"]
+feedback: list = ["Stay was okay.",
+                   "No complaints"]
 
 neg_feedback: list = [
     "Horrible apartment! Never again!",
