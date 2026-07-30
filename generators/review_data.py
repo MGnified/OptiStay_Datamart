@@ -7,8 +7,7 @@ pos_feedback: list = [
     "Definitely coming again!",
 ]
 
-feedback: list = ["Stay was okay.",
-                   "No complaints"]
+feedback: list = ["Stay was okay.", "No complaints"]
 
 neg_feedback: list = [
     "Horrible apartment! Never again!",
@@ -16,22 +15,31 @@ neg_feedback: list = [
     "Dirty and bad service",
 ]
 
-null = "NULL"
+null = 'NULL'
 
+review_type
 
 def generate_review(rating: int):
     if rating >= 4:
-        return rating, random.choice([null, random.choice(pos_feedback)])
+        comment = random.choice([null, random.choice(pos_feedback)])
 
     elif rating == 3:
-        return rating, random.choice([null, random.choice(feedback)])
+        comment = random.choice([null, random.choice(feedback)])
+
     else:
-        return rating, random.choice([null, random.choice(neg_feedback)])
+        comment = random.choice(neg_feedback)])
+
+
+
+    return rating, comment
 
 
 rating = random.randint(0, 5)
 
-with open(r"data\reviews.txt", "w") as review:
+
+
+
+with open("data/reviews.txt", "w") as review:
     for _ in range(20):
         review.write(str(generate_review(random.randint(0, 5))))
         review.write(f"\n {'=' * 40} \n")

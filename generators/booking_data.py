@@ -1,4 +1,4 @@
-#%%
+# %%
 from faker import Faker
 import random
 from datetime import timedelta
@@ -17,9 +17,22 @@ def generate_booking(past: bool, future: bool) -> tuple:
     num_guests = random.randint(1, 5)
 
     # price per night has to be added based on apartment
-    total_nights = check_out - check_in 
+    total_nights = check_out - check_in
 
-    return f'{check_in}', f'{check_out}', num_guests, total_nights.days
+    # 
+    booking_type = random.randint(1, 10)
+    user_id = random.randint(1, 20)
+    apartment = random.randint(1, 20)
+    
+    return (
+        f'{check_in}',
+        f'{check_out}',
+        num_guests,
+        total_nights.days,
+        booking_type,
+        user_id,
+        apartment,
+    )
 
 
 booking_dates = []
@@ -27,9 +40,7 @@ random_bool = random.choice([True, False])
 
 # generate_booking(random_bool, random_bool)
 
-with open('booking_data', 'w') as data:
-    for _ in range(20):
+with open("data/data.booking_data", "w") as data:
+    for _ in range(30):
         data.write(str(generate_booking(random_bool, random_bool)))
-        data.write('\n')
-
-
+        data.write("\n")

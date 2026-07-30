@@ -3,8 +3,7 @@ import random
 from faker import Faker
 from unidecode import unidecode
 
-# setting seed for reproducibility
-Faker.seed(27)
+Faker.seed(3)
 
 # defining locales to ensure names and addresses fit logically
 locales = [
@@ -34,7 +33,7 @@ dial_codes = {
 }
 
 
-def generate_dummy_data(locale: str) -> tuple:
+def generate_user_data(locale: str, address_only: bool = False) -> tuple:
     """
     Generate dummy data (name, email, address) ensuring all data is in the same locale
 
@@ -44,6 +43,7 @@ def generate_dummy_data(locale: str) -> tuple:
     Returns
         tuple: tuple of name, email, street, building_number, postal_code, city, country
     """
+
     fake = Faker(locale)
 
     # creating name details
@@ -63,6 +63,9 @@ def generate_dummy_data(locale: str) -> tuple:
     city = fake.city()
     country = countries[fake.current_country_code()]
 
+    if address_only: 
+        return street, building_number, city, postal_code, country
+
     return (
         [first_name, last_name, email, phone],
         [street, building_number, city, postal_code, country],
@@ -71,51 +74,39 @@ def generate_dummy_data(locale: str) -> tuple:
 
 # generating people/user data
 people_data = []
-headers = [
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "street",
-    "building_number",
-    "city",
-    "postal_code",
-    "country",
-]
-
-
 address_data = []
-for _ in range(20):
+
+for idx in range(1,21):
     locale = random.choice(locales)
-    data = generate_dummy_data(locale)
-    people_data.append(data[0])
+    data = generate_user_data(locale)
+
+    person = list(data[0])
+    person.append(idx)
+    people_data.append(person)
     address_data.append(data[1])
 
-# print(people_data)
-# print(address_data)
-
 address_sql_vals = [tuple(i) for i in address_data]
-print(address_sql_vals)
-print(f"\n {'=' * 50} \n")
 people_sql_vals = [tuple(i) for i in people_data]
-print(people_sql_vals)
-print(f"\n {'=' * 50} \n")
+
 # generate extra addresses for data variety
 
 extra_addresses = []
-for _ in range(10):
-    fake = Faker(random.choice(locales))
-    locales = ["de_DE", "de_AT", "fr_FR"]
-    street = fake.street_name()
-    building_number = fake.building_number()
-    postal_code = fake.postcode()
-    city = fake.city()
-    country = countries[fake.current_country_code()]
 
-    extra_addresses.append((street, building_number, postal_code, city, country))
+for _ in range(10):
+    address_locales = ["de_DE", "de_AT", "fr_FR"]
+    locale = random.choice(address_locales)
+    address = generate_user_data(locale, True)
+    extra_addresses.append(address)
 
 extra_address_vals = [tuple(i) for i in extra_addresses]
-print(extra_addresses)
 
-with open("values.txt", "w") as values:
-    values.write(str(address_sql_vals))
+
+with open('data/personal_data.txt', 'w') as data:
+        for address in address_sql_vals:
+            data.write(f'{address}\n')
+        data.write(f'{'-' * 60}\n')
+        for people in people_sql_vals:
+            data.write(f'{people}\n')
+        data.write(f'{'-' * 60}\n')
+        for extra in extra_address_vals:
+            data.write(f'{extra}\n')
