@@ -1,4 +1,5 @@
 import random
+
 from faker import Faker
 
 fake = Faker()
@@ -19,17 +20,19 @@ def generate_wishlist()-> tuple:
     user_id = random.randint(1,20)
     adding_date = fake.date_this_year(True, False)
 
-    return apartment_ID, user_id, adding_date
+    return apartment_ID, user_id, str(adding_date)
 
-recommendations = [generate_recommendation() in range(20)]
-wishlist = [generate_wishlist() in range(20)]
+recommendations = []
+wishlists = []
 
-print(recommendations)
-print(wishlist)
+for _ in range(20):
+    recommendations.append(generate_recommendation())
+    wishlists.append(generate_wishlist())
 
-# with open ('data/recommendations_wishlists.txt', 'w') as interaction:
-#     for _ in range(20):
-#         interaction.write(f'{generate_recommendation()}\n')
-#         interaction.write(f'{'-' * 60}\n')
-#         interaction.write(f'{generate_wishlist()}')
+with open ('data/user_interaction.txt', 'w') as interaction:
+    for recommendation in recommendations:
+        interaction.write(f'{recommendation}\n')
+    interaction.write(f'{'-' * 60}\n')
+    for wishlist in wishlists:
+        interaction.write(f'{wishlist}\n')
 
