@@ -15,9 +15,10 @@ neg_feedback: list = [
     "Dirty and bad service",
 ]
 
-null = 'NULL'
+null = "NULL"
 
-review_type = ['Host', 'Guest']
+review_type = ["Host", "Guest"]
+
 
 def generate_review(rating: int):
     if rating >= 4:
@@ -37,4 +38,4 @@ rating = random.randint(0, 5)
 
 with open("data/reviews.txt", "w") as review:
     for _ in range(20):
-        review.write(f'{generate_review(random.randint(0, 5))}\n')
+        review.write(f"{generate_review(random.randint(0, 5))}\n")

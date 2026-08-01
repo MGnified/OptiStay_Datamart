@@ -63,7 +63,7 @@ def generate_user_data(locale: str, address_only: bool = False) -> tuple:
     city = fake.city()
     country = countries[fake.current_country_code()]
 
-    if address_only: 
+    if address_only:
         return street, building_number, city, postal_code, country
 
     return (
@@ -76,7 +76,7 @@ def generate_user_data(locale: str, address_only: bool = False) -> tuple:
 people_data = []
 address_data = []
 
-for idx in range(1,21):
+for idx in range(1, 21):
     locale = random.choice(locales)
     data = generate_user_data(locale)
 
@@ -101,12 +101,12 @@ for _ in range(10):
 extra_address_vals = [tuple(i) for i in extra_addresses]
 
 
-with open('data/personal_data.txt', 'w') as data:
-        for address in address_sql_vals:
-            data.write(f'{address}\n')
-        data.write(f'{'-' * 60}\n')
-        for people in people_sql_vals:
-            data.write(f'{people}\n')
-        data.write(f'{'-' * 60}\n')
-        for extra in extra_address_vals:
-            data.write(f'{extra}\n')
+with open("data/personal_data.txt", "w") as data:
+    for address in address_sql_vals:
+        data.write(f"{address}\n")
+    data.write(f"{'-' * 60}\n")
+    for people in people_sql_vals:
+        data.write(f"{people}\n")
+    data.write(f"{'-' * 60}\n")
+    for extra in extra_address_vals:
+        data.write(f"{extra}\n")
