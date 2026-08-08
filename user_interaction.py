@@ -32,9 +32,12 @@ for _ in range(20):
     recommendations.append(generate_recommendation())
     wishlists.append(generate_wishlist())
 
-with open("data/user_interaction.txt", "w") as interaction:
-    for recommendation in recommendations:
-        interaction.write(f"{recommendation}\n")
-    interaction.write(f"{'-' * 60}\n")
-    for wishlist in wishlists:
-        interaction.write(f"{wishlist}\n")
+with open("data/recommendations.txt", "w") as entry:
+    for recommend in recommendations:
+        entry.write(f"{recommend}\n")
+
+with open("data/wishlist.txt", "w") as entry:
+    for wish in wishlists:
+        entry.write(f"{wish}\n")
+
+print("Data successfully generated!")

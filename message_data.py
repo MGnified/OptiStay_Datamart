@@ -28,3 +28,5 @@ with open("data/user_messages.txt", "w") as message:
 with open("data/support_messages.txt", "w") as message:
     for _ in range(20):
         message.write(f"{generate_message(random.randint(10, 500), True)},\n")
+
+print("Data successfully generated!")

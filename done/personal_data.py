@@ -110,3 +110,5 @@ with open("data/personal_data.txt", "w") as data:
     data.write(f"{'-' * 60}\n")
     for extra in extra_address_vals:
         data.write(f"{extra}\n")
+        
+print("Data successfully generated!")

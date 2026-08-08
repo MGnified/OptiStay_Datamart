@@ -12,3 +12,5 @@ def generate_fee_payment():
 
 def generate_host_payment():
     pass
+
+print("Data successfully generated!")

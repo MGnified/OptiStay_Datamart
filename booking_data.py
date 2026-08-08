@@ -29,19 +29,27 @@ prices = [
 ]
 
 
-def generate_booking(past: bool, future: bool) -> tuple:
+def generate_booking() -> tuple:
+    """
+    Generate booking dummy data 
 
+    Args:
+        locale (str): definition of the locale for the Faker in
+
+    Returns
+        tuple: tuple of name, email, street, building_number, postal_code, city, country
+    """
     # Check-in and Check-out calculations
-    check_in = fake.date_this_year(before_today=past, after_today=future)
+    check_in = fake.date_this_year(before_today=True, after_today=True)
     min_stay = check_in + timedelta(days=1)
     max_stay = check_in + timedelta(days=14)
     check_out = fake.date_between_dates(date_start=min_stay, date_end=max_stay)
     total_nights = check_out - check_in
 
     # booking date calculation
-    booking_start = date(2025, 12, 31)
-    booking_end = check_in - timedelta(1)
-    booking_date = fake.date_between(booking_start, booking_end)
+    booking_opening_date = date(2025, 12, 31)
+    last_booking_date = check_in - timedelta(1)
+    booking_date = fake.date_between(booking_opening_date, last_booking_date)
 
     # booking data randomizer
     num_guests = random.randint(1, 5)
@@ -64,10 +72,11 @@ def generate_booking(past: bool, future: bool) -> tuple:
 
 
 booking_dates = []
-random_bool = random.choice([True, False])
 
 # generate_booking(random_bool, random_bool)
 
 with open("data/booking_data.txt", "w") as data:
-    for _ in range(30):
-        data.write(f"{generate_booking(random_bool, random_bool)},\n")
+    for _ in range(40):
+        data.write(f"{generate_booking()},\n")
+
+print("Data successfully generated!")
