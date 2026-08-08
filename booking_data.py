@@ -1,5 +1,5 @@
 import random
-from datetime import timedelta, date
+from datetime import date, timedelta
 
 from faker import Faker
 
@@ -31,13 +31,13 @@ prices = [
 
 def generate_booking() -> tuple:
     """
-    Generate booking dummy data 
+    Generate booking dummy data with various information.
 
     Args:
-        locale (str): definition of the locale for the Faker in
+        None
 
     Returns
-        tuple: tuple of name, email, street, building_number, postal_code, city, country
+        tuple: tuple consisting of booking date, check-in, check-out, number of guests, price, total nights, user id and apartment id
     """
     # Check-in and Check-out calculations
     check_in = fake.date_this_year(before_today=True, after_today=True)
