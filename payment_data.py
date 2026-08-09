@@ -1,7 +1,9 @@
 from faker import Faker
 import random
+import pandas
 
 fake = Faker()
+
 
 
 def generate_payment() -> tuple:

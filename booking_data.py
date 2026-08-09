@@ -1,6 +1,6 @@
 import random
 from datetime import date, timedelta
-
+import pandas as pd
 from faker import Faker
 
 fake = Faker()
@@ -78,5 +78,5 @@ booking_dates = []
 with open("data/booking_data.txt", "w") as data:
     for _ in range(40):
         data.write(f"{generate_booking()},\n")
-
+        
 print("Data successfully generated!")
