@@ -78,5 +78,39 @@ booking_dates = []
 with open("data/booking_data.txt", "w") as data:
     for _ in range(40):
         data.write(f"{generate_booking()},\n")
-        
+
+file = r"G:\My Drive\Coding\SQL_dummy_data\data\booking_data.txt"
+
+headers = [
+    "booking_date",
+    "check_in",
+    "check_out",
+    "num_guests",
+    "price",
+    "total_nights",
+    "booking_type",
+    "user_id",
+    "apartment",
+    "Nothing",
+]
+
+bookings = pd.read_csv(file, header=None, names=headers, index_col=None)
+
+bookings["check_in"] = pd.to_datetime(bookings["check_in"])
+bookings["check_out"] = pd.to_datetime(bookings["check_out"])
+bookings["apartment"] = bookings["apartment"].str.strip(")").astype(int)
+
+cols = [
+    "check_in",
+    "check_out",
+    "num_guests",
+    "price",
+    "total_nights",
+    "user_id",
+]
+
+payment_bookings = bookings[cols]
+
+payment_bookings.to_csv(r"data\booking_data.csv")
+
 print("Data successfully generated!")

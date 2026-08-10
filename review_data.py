@@ -72,7 +72,7 @@ rating = random.randint(0, 5)
 with open("data/reviews.txt", "w") as review:
     for _ in range(40):
         review.write(
-            f"{generate_review(random.randint(0, 5), random.choice(review_type))}\n"
+            f"{generate_review(random.randint(0, 5), random.choice(review_type))},\n"
         )
 
 print("Data successfully generated!")
