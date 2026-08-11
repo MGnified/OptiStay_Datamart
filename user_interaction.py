@@ -6,14 +6,10 @@ fake = Faker()
 
 
 def generate_recommendation() -> tuple:
-    """
-    Generate dummy recommendation data.
-
-    Args:
-        None
+    """_summary_
 
     Returns:
-        tuple: tuple containing user ids for recommenders and recommended, and apartment id
+        tuple: _description_
     """
     recommended_by = random.randint(1, 20)
     recommended_to = random.randint(1, 20)
@@ -27,14 +23,10 @@ def generate_recommendation() -> tuple:
 
 
 def generate_wishlist() -> tuple:
-    """
-    Generate dummy wishlist data.
-
-    Args:
-        None
+    """_summary_
 
     Returns:
-        tuple: tuple containing apartment and user id, and an adding date.
+        tuple: _description_
     """
     apartment_ID = random.randint(1, 20)
     user_id = random.randint(1, 20)

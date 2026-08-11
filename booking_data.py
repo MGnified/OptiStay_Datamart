@@ -30,14 +30,10 @@ prices = [
 
 
 def generate_booking() -> tuple:
-    """
-    Generate booking dummy data with various information.
+    """_summary_
 
-    Args:
-        None
-
-    Returns
-        tuple: tuple consisting of booking date, check-in, check-out, number of guests, price, total nights, user id and apartment id
+    Returns:
+        tuple: _description_
     """
     # Check-in and Check-out calculations
     check_in = fake.date_this_year(before_today=True, after_today=True)

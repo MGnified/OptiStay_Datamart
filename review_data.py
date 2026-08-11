@@ -29,15 +29,14 @@ review_type = ["Host", "Guest", "Guest"]
 
 
 def generate_review(rating: int, type: str):
-    """
-    Generate dummy review data with various information.
+    """_summary_
 
     Args:
-        rating (int): Number of rating stars (0-5)
-        type (str): Specification of the rating type (Host or Guest)
+        rating (int): _description_
+        type (str): _description_
 
     Returns:
-        tuple: tuple containing rating, comment, rating type, date, user and booking id.
+        _type_: _description_
     """
     if type == "Guest":
         if rating >= 4:

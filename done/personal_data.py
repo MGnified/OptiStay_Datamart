@@ -34,14 +34,14 @@ dial_codes = {
 
 
 def generate_user_data(locale: str, address_only: bool = False) -> tuple:
-    """
-    Generate dummy data (name, email, address) ensuring all data is in the same locale
+    """_summary_
 
     Args:
-        locale (str): definition of the locale for the Faker in
+        locale (str): _description_
+        address_only (bool, optional): _description_. Defaults to False.
 
-    Returns
-        tuple: tuple of name, email, street, building_number, postal_code, city, country
+    Returns:
+        tuple: _description_
     """
 
     fake = Faker(locale)

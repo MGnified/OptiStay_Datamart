@@ -12,7 +12,15 @@ df["check_out"] = pd.to_datetime(df["check_out"])
 
 
 def generate_payment(row: int, df: pd.DataFrame) -> tuple | None:
+    """_summary_
 
+    Args:
+        row (int): _description_
+        df (pd.DataFrame): _description_
+
+    Returns:
+        tuple | None: _description_
+    """
     if df["check_in"][row] > pd.to_datetime(date.today()):
         return None
 
@@ -48,24 +56,37 @@ with open("data/payments.txt", "w") as pay:
 
 
 def generate_fee_payment() -> tuple:
-    payment_id = random.randint(1, 20)
-    price = round(100 * random.random(), 2)
+    """_summary_
 
-    return payment_id, price
+    Returns:
+        tuple: _description_
+    """
+    feetype_id = random.randint(1,15)
+    payment_id = random.randint(1, 28)
+    price = round(50 * random.random(), 2)
+
+    return feetype_id, payment_id, price
 
 
 def generate_host_payment() -> tuple:
+    """_summary_
 
+    Returns:
+        tuple: _description_
+    """
+
+    
     date = str(fake.date_time_this_year(before_now=True, after_now=False))
     commission = round(10 * random.random(), 2)
     host_fees = round(100 * random.random(), 2)
     gross = round((1000 * random.random() + commission + host_fees), 2)
     net = round(gross - commission, 2)
+    share = random.random()
     paid_to = random.choice(["Host", "CoHost"])
     payment_id = random.randint(1, 20)
     payee_id = random.randint(1, 20)
 
-    return date, gross, commission, host_fees, net, paid_to, payment_id, payee_id
+    return date, gross, commission, host_fees, net, share, paid_to, payment_id, payee_id
 
 
 with open("data/fee_payments.txt", "w") as fees:

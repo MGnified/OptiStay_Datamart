@@ -5,15 +5,14 @@ faker = Faker()
 
 
 def generate_message(characters: int, support: bool = False) -> tuple:
-    """
-    Generate dummy message data including sending information.
+    """_summary_
 
     Args:
-        characters (int): number of characters in the message text
-        support (bool): if True the data is generated between user and admin, defaults to false.
+        characters (int): _description_
+        support (bool, optional): _description_. Defaults to False.
 
     Returns:
-        tuple: tuple containing message text, sent at timestamp, sender and receiver user ID.
+        tuple: _description_
     """
     text = faker.text(max_nb_chars=characters).replace("\n", " ")
     sent_at = str(faker.date_time_this_year(before_now=True, after_now=False))
