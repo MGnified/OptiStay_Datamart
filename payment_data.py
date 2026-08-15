@@ -1,4 +1,3 @@
-
 from faker import Faker
 import random
 import pandas as pd
@@ -8,9 +7,11 @@ fake = Faker()
 
 
 df = pd.read_csv(r"data\booking_data.csv")
-df["check_in"] = pd.to_datetime(df["check_in"], )
+df["check_in"] = pd.to_datetime(
+    df["check_in"],
+)
 df["check_out"] = pd.to_datetime(df["check_out"])
-df['booking_date'] = pd.to_datetime(df["booking_date"])
+df["booking_date"] = pd.to_datetime(df["booking_date"])
 
 print(df.dtypes)
 print(df.head())
@@ -29,7 +30,7 @@ def generate_payment(row: int, df: pd.DataFrame) -> tuple | None:
     if df["check_in"][row] > pd.to_datetime(date.today()):
         return None
 
-    receipt = str(df['booking_date'][row])
+    receipt = str(df["booking_date"][row])
 
     sub_total = df["price"][row] * df["total_nights"][row]
     service_fee = round(200 * random.random(), 2)

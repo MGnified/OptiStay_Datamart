@@ -94,8 +94,8 @@ bookings = pd.read_csv(file, header=None, names=headers, index_col=None)
 
 bookings["check_in"] = pd.to_datetime(bookings["check_in"])
 bookings["check_out"] = pd.to_datetime(bookings["check_out"])
-bookings['booking_date'] = bookings["booking_date"].str.strip('(')
-bookings['booking_date'] = pd.to_datetime(bookings['booking_date'])
+bookings["booking_date"] = bookings["booking_date"].str.strip("(")
+bookings["booking_date"] = pd.to_datetime(bookings["booking_date"])
 bookings["apartment"] = bookings["apartment"].str.strip(")").astype(int)
 
 cols = [
