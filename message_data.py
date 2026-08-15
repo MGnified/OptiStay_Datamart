@@ -24,7 +24,9 @@ def generate_message(characters: int, support: bool = False) -> tuple:
         sender = random.randint(1, 20)
         receiver = random.randint(1, 20) if not support else random.randint(1, 5)
 
-    booking_id = random.choice(["NULL", random.randint(1, 20), random.randint(1,20), random.randint(1,20)])
+    booking_id = random.choice(
+        ["NULL", random.randint(1, 20), random.randint(1, 20), random.randint(1, 20)]
+    )
 
     return text, sent_at, receiver, sender, booking_id
 

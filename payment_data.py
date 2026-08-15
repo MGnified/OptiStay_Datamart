@@ -1,3 +1,4 @@
+
 from faker import Faker
 import random
 import pandas as pd
@@ -7,8 +8,12 @@ fake = Faker()
 
 
 df = pd.read_csv(r"data\booking_data.csv")
-df["check_in"] = pd.to_datetime(df["check_in"])
+df["check_in"] = pd.to_datetime(df["check_in"], )
 df["check_out"] = pd.to_datetime(df["check_out"])
+df['booking_date'] = pd.to_datetime(df["booking_date"])
+
+print(df.dtypes)
+print(df.head())
 
 
 def generate_payment(row: int, df: pd.DataFrame) -> tuple | None:
@@ -24,7 +29,7 @@ def generate_payment(row: int, df: pd.DataFrame) -> tuple | None:
     if df["check_in"][row] > pd.to_datetime(date.today()):
         return None
 
-    receipt = str(fake.date_time_this_year(before_now=True, after_now=False))
+    receipt = str(df['booking_date'][row])
 
     sub_total = df["price"][row] * df["total_nights"][row]
     service_fee = round(200 * random.random(), 2)
@@ -61,7 +66,7 @@ def generate_fee_payment() -> tuple:
     Returns:
         tuple: _description_
     """
-    feetype_id = random.randint(1,15)
+    feetype_id = random.randint(1, 15)
     payment_id = random.randint(1, 28)
     price = round(50 * random.random(), 2)
 
@@ -75,7 +80,6 @@ def generate_host_payment() -> tuple:
         tuple: _description_
     """
 
-    
     date = str(fake.date_time_this_year(before_now=True, after_now=False))
     commission = round(10 * random.random(), 2)
     host_fees = round(100 * random.random(), 2)
