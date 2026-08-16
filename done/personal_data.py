@@ -34,16 +34,6 @@ dial_codes = {
 
 
 def generate_user_data(locale: str, address_only: bool = False) -> tuple:
-    """_summary_
-
-    Args:
-        locale (str): _description_
-        address_only (bool, optional): _description_. Defaults to False.
-
-    Returns:
-        tuple: _description_
-    """
-
     fake = Faker(locale)
 
     # creating name details
@@ -89,7 +79,6 @@ address_sql_vals = [tuple(i) for i in address_data]
 people_sql_vals = [tuple(i) for i in people_data]
 
 # generate extra addresses for data variety
-
 extra_addresses = []
 
 for _ in range(10):

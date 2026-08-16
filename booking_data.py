@@ -1,5 +1,5 @@
 import random
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import pandas as pd
 from faker import Faker
 
@@ -30,11 +30,7 @@ prices = [
 
 
 def generate_booking() -> tuple:
-    """_summary_
 
-    Returns:
-        tuple: _description_
-    """
     # Check-in and Check-out calculations
     check_in = fake.date_this_year(before_today=True, after_today=True)
     min_stay = check_in + timedelta(days=1)
@@ -43,9 +39,9 @@ def generate_booking() -> tuple:
     total_nights = check_out - check_in
 
     # booking date calculation
-    booking_opening_date = date(2025, 12, 31)
-    last_booking_date = check_in - timedelta(1)
-    booking_date = fake.date_between(booking_opening_date, last_booking_date)
+    booking_opening_date = datetime(2025, 12, 31, 0, 0, 0)
+    last_booking_date = check_in - timedelta(days=1)
+    booking_date = fake.date_time_between(booking_opening_date, last_booking_date)
 
     # booking data randomizer
     num_guests = random.randint(1, 5)
@@ -72,10 +68,10 @@ booking_dates = []
 # generate_booking(random_bool, random_bool)
 
 with open("data/booking_data.txt", "w") as data:
-    for _ in range(40):
+    for _ in range(20):
         data.write(f"{generate_booking()},\n")
 
-file = r"G:\My Drive\Coding\SQL_dummy_data\data\booking_data.txt"
+file = r'data/booking_data.txt'
 
 headers = [
     "booking_date",
@@ -110,6 +106,7 @@ cols = [
 
 payment_bookings = bookings[cols]
 
-payment_bookings.to_csv(r"data\booking_data.csv")
+payment_bookings.to_csv(r"data\booking_data.csv", columns=cols, index=False)
+
 
 print("Data successfully generated!")

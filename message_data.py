@@ -5,15 +5,7 @@ faker = Faker()
 
 
 def generate_message(characters: int, support: bool = False) -> tuple:
-    """_summary_
 
-    Args:
-        characters (int): _description_
-        support (bool, optional): _description_. Defaults to False.
-
-    Returns:
-        tuple: _description_
-    """
     text = faker.text(max_nb_chars=characters).replace("\n", " ")
     sent_at = str(faker.date_time_this_year(before_now=True, after_now=False))
 

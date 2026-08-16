@@ -6,11 +6,7 @@ fake = Faker()
 
 
 def generate_recommendation() -> tuple:
-    """_summary_
 
-    Returns:
-        tuple: _description_
-    """
     recommended_by = random.randint(1, 20)
     recommended_to = random.randint(1, 20)
 

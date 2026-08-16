@@ -29,15 +29,7 @@ review_type = ["Host", "Guest", "Guest"]
 
 
 def generate_review(rating: int, type: str):
-    """_summary_
 
-    Args:
-        rating (int): _description_
-        type (str): _description_
-
-    Returns:
-        _type_: _description_
-    """
     if type == "Guest":
         if rating >= 4:
             comment = random.choice(["NULL", random.choice(user_pos_feedback)])
