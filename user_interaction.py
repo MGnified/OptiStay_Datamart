@@ -1,49 +1,70 @@
+# %%
 import random
+import pandas as pd
 
 from faker import Faker
 
 fake = Faker()
 
+apartment_df = pd.read_excel("data/apartment_data.xlsx")
+cohost_df = pd.read_csv("data/cohost_apartment.csv")
+
 
 def generate_recommendation() -> tuple:
+
+    row = apartment_df.iloc[random.randint(0, len(apartment_df) - 1)]
+    apartment_id = row["ApartmentID"]
+    host_id = row["UserID"]
+
+    cohost_check = cohost_df[cohost_df["ApartmentID"] == apartment_id]                          ]
+    cohost_checklist = cohost_check["CoHostID"].to_list()
 
     recommended_by = random.randint(1, 20)
     recommended_to = random.randint(1, 20)
 
-    if recommended_by == recommended_to:
+    while (
+        recommended_by == recommended_to
+        or recommended_to == host_id
+        or recommended_to in cohost_checklist
+    ):
         recommended_to = random.randint(1, 20)
 
-    apartment_id = random.randint(1, 20)
+    return recommended_by, recommended_to, int(apartment_id)
 
-    return recommended_by, recommended_to, apartment_id
+
+generate_recommendation()
+
+with open("data/recommendations.txt", "w") as entry:
+    for _ in range(20):
+        entry.write(f'{generate_recommendation()},\n')    
+
+# %%
 
 
 def generate_wishlist() -> tuple:
-    """_summary_
 
-    Returns:
-        tuple: _description_
-    """
-    apartment_ID = random.randint(1, 20)
+    row = apartment_df.iloc[random.randint(0, len(apartment_df) - 1)]
+    apartment_id = row['ApartmentID']
+
+    host_id = row["UserID"]
+
+    cohost_check = cohost_df[cohost_df["ApartmentID"] == apartment_id]
+    cohost_checklist = cohost_check["CoHostID"].to_list()
     user_id = random.randint(1, 20)
+
+    while user_id == host_id or user_id in cohost_checklist:
+        user_id = random.randint(1, 20)
+
     adding_date = fake.date_this_year(True, False)
 
-    return apartment_ID, user_id, str(adding_date)
+    return int(apartment_id), user_id, str(adding_date)
 
 
-recommendations = []
-wishlists = []
-
-for _ in range(20):
-    recommendations.append(generate_recommendation())
-    wishlists.append(generate_wishlist())
-
-with open("data/recommendations.txt", "w") as entry:
-    for recommend in recommendations:
-        entry.write(f"{recommend}\n")
 
 with open("data/wishlist.txt", "w") as entry:
-    for wish in wishlists:
-        entry.write(f"{wish}\n")
+    for _ in range(20):
+        entry.write(f'{generate_wishlist()},\n')
 
 print("Data successfully generated!")
+
+# %%

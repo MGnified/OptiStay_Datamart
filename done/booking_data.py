@@ -5,7 +5,7 @@ from faker import Faker
 
 fake = Faker()
 
-apartment_df = pd.read_csv('data/apartment_data.csv', skipinitialspace=True)
+apartment_df = pd.read_excel('data/apartment_data.xlsx')
 cohost_df = pd.read_csv('data/cohost_apartment.csv', skipinitialspace=True)
 user_df = pd.read_csv('data/user_addresses.csv', skipinitialspace=True)
 print(apartment_df.columns)
