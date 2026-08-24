@@ -1,4 +1,3 @@
-# %%
 import random
 import pandas as pd
 
@@ -32,14 +31,9 @@ def generate_recommendation() -> tuple:
     return recommended_by, recommended_to, int(apartment_id)
 
 
-generate_recommendation()
-
 with open("data/recommendations.txt", "w") as entry:
     for _ in range(20):
         entry.write(f'{generate_recommendation()},\n')    
-
-# %%
-
 
 def generate_wishlist() -> tuple:
 
@@ -66,5 +60,3 @@ with open("data/wishlist.txt", "w") as entry:
         entry.write(f'{generate_wishlist()},\n')
 
 print("Data successfully generated!")
-
-# %%
