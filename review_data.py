@@ -1,12 +1,17 @@
 import random
-
+import pandas as pd
+from datetime import datetime, date, timedelta
 from faker import Faker
 
 fake = Faker()
 
+# Needed columns:
+# check out date, host Id, user ID
+review_df = pd.read_excel("data/booking_messages.xlsx")
+
 user_pos_feedback = [
     "Very nice apartment! Perfectly located and clean.",
-    "looked exactly like in the pictures",
+    "Looked exactly like in the pictures",
     "Definitely coming again!",
 ]
 
@@ -22,7 +27,7 @@ host_pos_feedback = [
     "Very polite and reliable",
 ]
 
-host_neg_feedback = ["Didn't like them", "Left a mess in the apartment!!"]
+host_neg_feedback = ["Didn't like them", "Left a mess in the apartment!"]
 
 
 review_type = ["Host", "Guest", "Guest"]
@@ -30,7 +35,18 @@ review_type = ["Host", "Guest", "Guest"]
 
 def generate_review(rating: int, type: str):
 
+    row = review_df.iloc[random.randint(0, len(review_df) - 1)]
+
+    check_out = pd.to_datetime(row["CheckOutDate"])
+    
+    while check_out > datetime.now(): 
+        row = review_df.iloc[random.randint(0, len(review_df) - 1)]
+        check_out = pd.to_datetime(row["CheckOutDate"])      
+
+    review_threshold = check_out + timedelta(2) 
+
     if type == "Guest":
+        user_id = row["UserID"]
         if rating >= 4:
             comment = random.choice(["NULL", random.choice(user_pos_feedback)])
 
@@ -40,7 +56,8 @@ def generate_review(rating: int, type: str):
         else:
             comment = random.choice(["NULL", random.choice(user_neg_feedback)])
 
-    elif type == "Host":
+    if type == "Host":
+        user_id = row["HostID"]
         if rating >= 4:
             comment = random.choice(["NULL", random.choice(host_pos_feedback)])
 
@@ -50,20 +67,18 @@ def generate_review(rating: int, type: str):
         else:
             comment = random.choice(["NULL", random.choice(host_neg_feedback)])
 
-    date = str(fake.date_time_this_year())
-    user_id = random.randint(1, 20)
-    booking_id = random.randint(1, 20)
+    booking_id = row["BookingID"]
+    check_out = pd.to_datetime(row["CheckOutDate"])
+    review_threshold = check_out + timedelta(2)
+    review_date = fake.date_time_between(check_out, review_threshold)
 
-    return rating, comment, type, date, user_id, booking_id
-
-
-rating = random.randint(0, 5)
+    return rating, comment, type, str(review_date), int(user_id), int(booking_id)
 
 
 with open("data/reviews.txt", "w") as review:
-    for _ in range(40):
+    for _ in range(20):
         review.write(
-            f"{generate_review(random.randint(0, 5), random.choice(review_type))},\n"
+            f"{generate_review(random.randint(1,5), random.choice(review_type))},\n"
         )
 
 print("Data successfully generated!")

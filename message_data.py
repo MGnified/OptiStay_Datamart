@@ -1,26 +1,39 @@
 import random
+
+import pandas as pd
+from datetime import datetime
 from faker import Faker
 
-faker = Faker()
+fake = Faker()
 
+# Needed columns in df: 
+# booking date, check in & out, user ID, hostID
+message_data_df = pd.read_excel('data/booking_messages.xlsx')
 
 def generate_message(characters: int, support: bool = False) -> tuple:
 
-    text = faker.text(max_nb_chars=characters).replace("\n", " ")
-    sent_at = str(faker.date_time_this_year(before_now=True, after_now=False))
+    row = message_data_df.iloc[random.randint(0, len(message_data_df)-1)]
+    text = fake.text(max_nb_chars=characters).replace("\n", " ")
+    booking_date = pd.to_datetime(row['BookingDate'])
+    check_out = pd.to_datetime(row['CheckOutDate'])
+    sending_threshold = fake.date_time_between(booking_date, check_out)
+    sent_at = fake.date_time_between(sending_threshold, datetime.now())
+    booking_id = row['BookingID']
 
-    sender = random.randint(1, 20)
-    receiver = random.randint(1, 20) if not support else random.randint(1, 5)
+    if support:
+        sender = row['UserID']
+        receiver = random.randint(1,5)
 
-    if sender == receiver:
-        sender = random.randint(1, 20)
-        receiver = random.randint(1, 20) if not support else random.randint(1, 5)
+    else:
+        sender = random.choice([row['UserID'], row['HostID']])
+        receiver = row['UserID'] if sender == row['HostID'] else row["HostID"]
 
-    booking_id = random.choice(
-        ["NULL", random.randint(1, 20), random.randint(1, 20), random.randint(1, 20)]
-    )
+    # if sender == receiver:
+    #     sender = random.randint(1,20)
+    #     receiver = random.randint(1, 20) if not support else random.randint(1, 5)
 
-    return text, sent_at, receiver, sender, booking_id
+
+    return text, str(sent_at), int(receiver), int(sender), int(booking_id)
 
 
 with open("data/user_messages.txt", "w") as message:
