@@ -34,6 +34,10 @@ dial_codes = {
 
 
 def generate_user_data(locale: str, address_only: bool = False) -> tuple:
+    """Generate dummy user date with various personal data.
+    Also a function is implemented to only generate addresses."""
+
+    # defining Faker class inside the function to ensure locale stays the same
     fake = Faker(locale)
 
     # creating name details
@@ -53,6 +57,7 @@ def generate_user_data(locale: str, address_only: bool = False) -> tuple:
     city = fake.city()
     country = countries[fake.current_country_code()]
 
+    # logic to return only address or whole user data
     if address_only:
         return street, building_number, city, postal_code, country
 
