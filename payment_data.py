@@ -1,4 +1,3 @@
-# %%
 from faker import Faker
 import random
 import pandas as pd
@@ -9,15 +8,7 @@ fake = Faker()
 bookings_df = pd.read_excel(r"data/booking_full.xlsx")
 amenities_df = pd.read_excel(r"data/apartment_amenities.xlsx")
 feetypes_df = pd.read_excel("data/feetypes.xlsx")
-print(feetypes_df)
-print(bookings_df.head())
-print(amenities_df.head())
-
-# print(amenities_df['Amenity'].unique())
-# print(f'bookings_df: {bookings_df.columns}')
-# print(f'amenities_df: {amenities_df.columns}')
-# print(f'feetypes_df: {feetypes_df.columns}')
-
+cohost_df = pd.read_csv('data/cohost_apartment.csv')
 
 taxes = {"AUT": 0.1, "DEU": 0.07, "CHE": 0.038, "FRA": 0.1, "NLD": 0.21}
 
@@ -41,19 +32,11 @@ platform_fee_prices = {
     14: (0.05, 0.15),  # booking protection
 }
 
-# round(random.uniform(fee_prices[1][0], fee_prices[1][1]), 2)
-
-apartment_amenities = (
-    amenities_df.groupby("ApartmentID")["Amenity"].apply(set).to_dict()
-)
+apartment_amenities = (amenities_df.groupby("ApartmentID")["Amenity"].apply(set).to_dict())
 
 payment_methods = {9, 10}  # excluded ids for gift card & Corporate invoice
 
-
-# %%
-def generate_fee_payment(
-    booking_row: pd.Series, payment_id: int, payment_method_id: int, subtotal: float, 
-):
+def generate_fee_payment(booking_row: pd.Series,payment_id: int,payment_method_id: int, subtotal: float) -> list[tuple]:
     """Generate dummy data for fee payments with randomized prices based on a previously created dictionary."""
 
     fees = []
@@ -67,12 +50,13 @@ def generate_fee_payment(
 
     # specifying number of additional fees to add, randomizing them & subsetting additional amenities for fees
     num_of_fees = random.choices([0, 1, 2, 3, 4, 5], weights=[0.5, 0.1, 0.1, 0.1, 0.1, 0.1], k=1)[0]
+    
     randomized_fees = random.sample([4, 5, 8, 9, 10], num_of_fees)
     amenity_set = apartment_amenities[booking_row["ApartmentID"]]
 
-    # appending randomized fees with no connection to amenities 
+    # appending randomized fees with no connection to amenities
     for fee in randomized_fees:
-        fees.append((fee, payment_id, round(random.uniform(fee_prices[fee][0], fee_prices[fee][1]), 2),))
+        fees.append((fee,payment_id,round(random.uniform(fee_prices[fee][0], fee_prices[fee][1]), 2)))
 
     # appending parking if defined in amenity for this booked apartment
     if "Parking" in amenity_set:
@@ -90,7 +74,7 @@ def generate_fee_payment(
     extra_guests = booking_row["NumberOfGuests"] - (booking_row["NumberOfBedrooms"] + 1)
 
     if extra_guests > 0:
-        extra_guest_price = float(extra_guests * (random.uniform(fee_prices[3][0], fee_prices[3][1]))) 
+        extra_guest_price = float(extra_guests * (random.uniform(fee_prices[3][0], fee_prices[3][1])))
         fees.append((3, payment_id, round(extra_guest_price, 2)))
 
     # adding platform fees randomly for protections
@@ -107,78 +91,53 @@ def generate_fee_payment(
     if payment_method_id not in payment_methods:
         processing = subtotal * random.uniform(platform_fee_prices[13][0], platform_fee_prices[13][1])
         fees.append((13, payment_id, round(processing, 2)))
-    
+
     return fees
 
 
-generate_fee_payment(bookings_df.iloc[0], 1, 4, 1000)
-#%% 
-payment_method = random.randint(1, 10)
- 
-def generate_payment(booking_row: pd.Series, payment_id: int, booking_id: int, payment_method_id: int, ) -> tuple:
+def generate_payment(booking_row: pd.Series, booking_id: int, payment_method_id: int, fee_list: list[tuple], subtotal: float,
+) -> tuple:
     """Generate dummy data of payments for each booking."""
-    receipt = str(booking_row[''])
+    receipt = str(booking_row["BookingDate"])
 
-    sub_total = df["price"][row] * df["total_nights"][row]
-    service_fee = round(200 * random.random(), 2)
-    total_tax = round(random.choice(taxes) * sub_total)
-    total_amount = round(sub_total + service_fee + total_tax, 2)
+    platform_total = 0.0
+    host_total = 0.0
 
-    method = random.randint(1, 11)
+    for fee in fee_list:
+        price = fee[2]
+        if fee[0] in platform_fee_prices:
+            platform_total += price
+        else:
+            host_total += price
 
-    # simplified address id since user id is equivalent to address ID in dummy data
-    address = booking_row['UserID']
+    total_tax = round(subtotal * taxes[booking_row["Country"]], 2)
+    total_amount = round(sub_total + platform_total + host_total + total_tax, 2)
 
+    # simplified address id since user ID is equivalent to address ID in dummy data
+    address = booking_row["UserID"]
 
-    return (
-        receipt,
-        float(sub_total),
-        service_fee,
-        total_tax,
-        float(total_amount),
-        booking_id,
-        payment_method_id,
-        address, 
+    return (receipt, float(subtotal), round(platform_total, 2),float(total_tax),
+        float(total_amount), booking_id, payment_method_id,int(address),
     )
 
 
-with open("data/payments.txt", "w") as pay:
-    for i in range(len(bookings_df)):
-        payment = generate_payment(row=i, df=bookings_df)
-        pay.write(f"{payment},\n")
+payment_id = 1
+fee_payments = []
+payments = []
 
+with (open("data/fee_payments.txt", "w") as fee_txt, open("data/payments.txt", "w") as payment_txt):
 
-def generate_host_payout(row, df) -> tuple:
-    """Generate dummy data for host payouts based for each payment entry."""
-    pay_date = str(df["receipt"][row] + timedelta(hours=24))
-    commission = round(df["total_amount"][row] * 0.03, 2)
-    host_fees = round(100 * random.random(), 2)
-    gross = round(df["total_amount"][row] + commission + host_fees, 2)
-    net = round(gross - commission, 2)
-    share = random.choice([1, round(random.random(), 2)])
-    paid_to = random.choice(["Host", "CoHost"]) if share < 1 else "Host"
-    payment_id = row + 1
-    payee_id = random.randint(1, 20)
+    for idx, row in bookings_df.iterrows():
+        sub_total = row["PricePerNight"] * row["TotalNights"]
+        payment_method = random.randint(1, 10)
 
-    return (
-        f"{pay_date}",
-        float(gross),
-        float(commission),
-        float(host_fees),
-        float(net),
-        float(share),
-        paid_to,
-        payment_id,
-        payee_id,
-    )
+        fee_payment = generate_fee_payment(row, payment_id, payment_method, sub_total)
+        for fee in fee_payment:
+            fee_txt.write(f"{fee}, \n")
 
+        payment = generate_payment(row, row["BookingID"], payment_method, fee_payment, sub_total)
+        payment_txt.write(f"{payment}, \n")
 
-with open("data/host_payments.txt", "w") as host:
-    for i in range(20):
-        host.write(f"{generate_host_payout(row=i, df=payments)},\n")
-
-with open("data/fee_payments.txt", "w") as fees:
-    for _ in range(50):
-        fees.write(f"{generate_fee_payment()},\n")
+        payment_id += 1
 
 print("Data successfully generated!")
