@@ -36,8 +36,8 @@ review_type = ["Host", "Guest", "Guest"]
 review_set = set()
 
 
-def generate_review(rating: int, type: str):
-    """Generate dummy review data for Hosts and users with previously created comments."""
+def generate_review(rating: int, rating_type: str) -> tuple:
+    """Generate host and guest review comments, matched to the rating by sentiment band."""
 
     # determining random row of the bookings
     row = review_df.iloc[random.randint(0, len(review_df) - 1)]
@@ -46,18 +46,18 @@ def generate_review(rating: int, type: str):
     check_out = pd.to_datetime(row["CheckOutDate"])
     booking_id = row["BookingID"]
 
-    while check_out > datetime.now() or (booking_id, type) in review_set:
+    while check_out > datetime.now() or (booking_id, rating_type) in review_set:
         row = review_df.iloc[random.randint(0, len(review_df) - 1)]
         check_out = pd.to_datetime(row["CheckOutDate"])
         booking_id = row["BookingID"]
 
     # adding reviews to predefined set to ensure no duplicates are inserted
-    review_set.add((booking_id, type))
+    review_set.add((booking_id, rating_type))
     review_threshold = check_out + timedelta(2)
     review_date = fake.date_time_between(check_out, review_threshold)
 
     # logic to decide between user review and host review
-    if type == "Guest":
+    if rating_type == "Guest":
         user_id = row["UserID"]
         if rating >= 4:
             comment = random.choice(user_pos_feedback)
@@ -68,7 +68,7 @@ def generate_review(rating: int, type: str):
         else:
             comment = random.choice(user_neg_feedback)
 
-    if type == "Host":
+    if rating_type == "Host":
         user_id = row["HostID"]
         if rating >= 4:
             comment = random.choice(host_pos_feedback)
@@ -79,7 +79,7 @@ def generate_review(rating: int, type: str):
         else:
             comment = random.choice(host_neg_feedback)
 
-    return rating, comment, type, str(review_date), int(user_id), int(booking_id)
+    return rating, comment, rating_type, str(review_date), int(user_id), int(booking_id)
 
 
 with open("data/reviews.txt", "w") as review:

@@ -1,43 +1,24 @@
+# importing important libraries and set up a seed for reproducibility
 import random
-
 from faker import Faker
 from unidecode import unidecode
 
-Faker.seed(3)
+Faker.seed(27)
 
 # defining locales to ensure names and addresses fit logically
-locales = [
-    "de_DE",
-    "de_AT",
-    "de_CH",
-    "fr_FR",
-    "nl_NL",
-]
+locales = ["de_DE", "de_AT", "de_CH", "fr_FR", "nl_NL"]
 
 # dictionary to map ISO Alpha-2 to ISO Alpha-3
-countries = {
-    "DE": "DEU",
-    "AT": "AUT",
-    "CH": "CHE",
-    "FR": "FRA",
-    "NL": "NLD",
-}
+countries = {"DE": "DEU", "AT": "AUT", "CH": "CHE", "FR": "FRA", "NL": "NLD"}
 
 # dictionary for country dial codes
-dial_codes = {
-    "DE": "+49",
-    "AT": "+43",
-    "CH": "+41",
-    "FR": "+33",
-    "NL": "+31",
-}
+dial_codes = {"DE": "+49", "AT": "+43", "CH": "+41", "FR": "+33", "NL": "+31"}
 
 
 def generate_user_data(locale: str, address_only: bool = False) -> tuple:
-    """Generate dummy user date with various personal data.
-    Also a function is implemented to only generate addresses."""
+    """Generate dummy user data and address data for specified locales."""
 
-    # defining Faker class inside the function to ensure locale stays the same
+    # defining one generator per locale to call it with the specified locale
     fake = Faker(locale)
 
     # creating name details
@@ -45,6 +26,7 @@ def generate_user_data(locale: str, address_only: bool = False) -> tuple:
     last_name = fake.last_name()
 
     # creating contact details
+    # unidecode strips diacritics & removes spaces from compound names
     email_first = unidecode(first_name.lower()).replace(" ", "")
     email_last = unidecode(last_name.lower()).replace(" ", "")
     email = f"{email_first}.{email_last}@{fake.free_email_domain()}"
@@ -57,10 +39,11 @@ def generate_user_data(locale: str, address_only: bool = False) -> tuple:
     city = fake.city()
     country = countries[fake.current_country_code()]
 
-    # logic to return only address or whole user data
+    # create addresses that are not attached to users for additional apartment/invoice addresses
     if address_only:
         return street, building_number, city, postal_code, country
 
+    # separate lists -> Users & Addresses are separate tables
     return (
         [first_name, last_name, email, phone],
         [street, building_number, city, postal_code, country],

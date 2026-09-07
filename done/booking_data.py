@@ -35,19 +35,21 @@ def generate_booking() -> tuple:
     check_out = fake.date_between_dates(date_start=min_stay, date_end=max_stay)
     total_nights = check_out - check_in
 
-    # booking date calculation
+    # defining the platform launch data -> no booking can predate it
     booking_opening_date = datetime(2025, 12, 31, 0, 0, 0)
+
+    # booking can never be after check-in & never in the future
     last_booking_date = min(check_in - timedelta(days=1), date.today())
     booking_date = fake.date_time_between(booking_opening_date, last_booking_date)
 
-    # booking data randomizer
+    # apartment is picked at random. guests/type/price are derived from that
     row = apartment_df.iloc[random.randint(0, len(apartment_df) - 1)]
     apartment = row["ApartmentID"]
     num_guests = random.randint(1, row["NumberOfBedrooms"] * 2)
     price = row["BasePricePerNight"]
     booking_type = random.choice(booking_types[num_guests])
 
-    # storing user id and back-check for Co Hosts
+    # a booker cannot be the host/co-host of the apartment they book
     user_id = random.choice(user_df["UserID"])
     cohost_check = cohost_df[cohost_df["ApartmentID"] == apartment]
     cohost_checklist = cohost_check["CoHostID"].to_list()

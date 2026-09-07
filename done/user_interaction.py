@@ -10,7 +10,7 @@ cohost_df = pd.read_csv("data/cohost_apartment.csv")
 
 
 def generate_recommendation() -> tuple:
-    """Generated dummy data for recommendations between users."""
+    """Generate dummy data for recommendations between users."""
 
     # locating a randomized row to determine apartments & hosts/cohosts
     row = apartment_df.iloc[random.randint(0, len(apartment_df) - 1)]
@@ -35,14 +35,15 @@ def generate_recommendation() -> tuple:
 
 with open("data/recommendations.txt", "w") as entry:
     for _ in range(20):
-        entry.write(f'{generate_recommendation()},\n')    
+        entry.write(f"{generate_recommendation()},\n")
+
 
 def generate_wishlist() -> tuple:
     """Generate dummy data for wishlist entries."""
 
     # locating randomized apartment row & extracting apartment & hosts/cohosts
     row = apartment_df.iloc[random.randint(0, len(apartment_df) - 1)]
-    apartment_id = row['ApartmentID']
+    apartment_id = row["ApartmentID"]
 
     host_id = row["UserID"]
 
@@ -61,9 +62,8 @@ def generate_wishlist() -> tuple:
     return int(apartment_id), user_id, str(adding_date)
 
 
-
 with open("data/wishlist.txt", "w") as entry:
     for _ in range(20):
-        entry.write(f'{generate_wishlist()},\n')
+        entry.write(f"{generate_wishlist()},\n")
 
 print("Data successfully generated!")
