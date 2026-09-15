@@ -23,16 +23,57 @@ The next step is to connect to the server at `localhost:3306` as root, using the
 SCHEMA -> ALTER -> INSERT -> TRIGGER -> CONSTRAINT TESTS, JOINS
 ```
 
-The provided files were created in a specific order during development. To create the `OptiStayDatamart`  and the 23 tables, run the `datamart_schema` file.
+The provided files were created in a specific order during development. To create the `OptiStayDatamart`  and the 23 tables, run the `01_schema.sql` file.
 
-Since changes were made after implementation, and `ALTER TABLE` statements were implemented and tested as well, the `datamart_alter_table` file has to be executed after the creation, but mandatorily before the `INSERT` statements.
+Since changes were made after implementation, and `ALTER TABLE` statements were implemented and tested as well, the `02_alter.sql` file has to be executed after the creation, but mandatorily before the `INSERT` statements.
 
-The dummy data insertion is stored in the `datamart_inserts` file, in which all `INSERT` commands populate the database with pre-generated dummy data. This file has to be executed after the `ALTER TABLE` file. The dummy data was pre-generated with Python scripts in order to fill the database with data for later constraint tests and joins.
+The dummy data insertion is stored in the `03_inserts.sql` file, in which all `INSERT` commands populate the database with pre-generated dummy data. This file has to be executed after the `ALTER TABLE` file. The dummy data was pre-generated with Python scripts in order to fill the database with data for later constraint tests and joins.
 
-To provide automation and ensure specific data integrity, triggers were implemented in the database within the `datamart_triggers` file. This file must mandatorily run after the `INSERT` statements, since the HostPayouts rows are already filled with dummy data, ensuring that the database is populated with the required number of entries. Otherwise, the trigger could produce duplicate rows in the HostPayouts table or lead to errors and malfunctions.
+To provide automation and ensure specific data integrity, triggers were implemented in the database within the `04_triggers.sql` file. This file must mandatorily run after the `INSERT` statements, since the HostPayouts rows are already filled with dummy data, ensuring that the database is populated with the required number of entries. Otherwise, the trigger could produce duplicate rows in the HostPayouts table or lead to errors and malfunctions.
 
-Constraint tests and complex `JOIN` queries are shown in the `datamart_constraint_test` and `datamart_joins` files and can be executed after the previously stated files.
+Constraint tests and complex `JOIN` queries are shown in the `tests.sql` and `joins.sql` files and can be executed after the previously stated files.
 
 ## Verification
 
-// add verification with sql command -> row counts per table 
+The verification layer is created via the `metadata.sql` file, showing the total volume of the database in bytes, the total number of tables in the database 
+and the amount of entities per table
+
+### Volume
+
+| TotalDataLength | TotalIndexLength |
+| --------------- | ---------------- |
+| 376832          | 671744           |
+
+### Number of tables
+
+| NumberOfTables |
+| -------------- |
+| 23             |
+
+### Number of Entities per Table
+
+| TableName               | NumberOfEntries |
+| ----------------------- | --------------- |
+| Admins                  | 5               |
+| Apartments              | 20              |
+| Hosts                   | 6               |
+| Users                   | 20              |
+| Bookings                | 20              |
+| HostPayouts             | 26              |
+| Payments                | 20              |
+| Reviews                 | 20              |
+| CustomerSupport         | 20              |
+| UserChats               | 20              |
+| Addresses               | 30              |
+| Amenities               | 20              |
+| ApartmentNeighbourhoods | 10              |
+| ApartmentStyles         | 10              |
+| BookingTypes            | 10              |
+| FeeTypes                | 14              |
+| PaymentMethods          | 10              |
+| Pictures                | 56              |
+| ApartmentAmenities      | 89              |
+| CoHostAssignments       | 7               |
+| FeePayments             | 121             |
+| Recommendations         | 20              |
+| Wishlists               | 20              |
