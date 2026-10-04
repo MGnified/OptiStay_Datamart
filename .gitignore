@@ -15,8 +15,8 @@ env/
 *.zip
 *.shp
 data/
-00_Screenshots/
-*.png
+*.json
+*.dbdiagram
 
 # Notebooks & IDEs
 .ipynb_checkpoints/

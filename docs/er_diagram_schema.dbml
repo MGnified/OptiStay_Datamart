@@ -1,0 +1,417 @@
+Project OptiStay_Datamart{
+  database_type: 'MySQL'
+  Note: 'Building the Optistay Datamart as an Airbnb use case'
+}
+
+Enum "FeeTypes_Category_enum" {
+  "Host"
+  "Platform"
+}
+
+Enum "HostPayouts_PaidTo_enum" {
+  "Host"
+  "CoHost"
+}
+
+Enum "Reviews_RatingType_enum" {
+  "Host"
+  "Guest"
+}
+
+Table "Admins" {
+  "AdminID" INTEGER [pk, increment, note: 'Surrogate primary key for admin users']
+  "FirstName" VARCHAR(100) [not null, note: 'Legal first name, changed via ALTER TABLE']
+  "LastName" VARCHAR(100) [not null, note: 'Legal last name, changed via ALTER TABLE']
+  "Email" VARCHAR(254) [unique, not null, note: 'Must contain an @ sign']
+  "Password" VARCHAR(32) [not null, note: 'Must contain at least 8 and up to 32 characters']
+
+  Checks {
+    `LENGTH(FirstName) >= 2` [name: 'Admin_FrstLng']
+    `LENGTH(LastName) >= 2` [name: 'Admin_LstLng']
+    `Email LIKE '%@%'` [name: 'Admin_Eml']
+    `LENGTH(Password) BETWEEN 8 AND 32` [name: 'Admin_PwLng']
+  }
+  Note: 'Dimension table storing system administrators'
+}
+
+Table "Addresses" {
+  "AddressID" INTEGER [pk, increment, note: 'Surrogate primary key for address data']
+  "Street" VARCHAR(255) [not null, note: 'Must contain at least 2 characters, changed via ALTER TABLE']
+  "HouseNumber" VARCHAR(10) [not null, note: 'Can contain various characters (e.g., 15b), changed via ALTER TABLE']
+  "City" VARCHAR(100) [not null, note: 'Must contain at least 2 characters,changed via ALTER TABLE']
+  "PostalCode" VARCHAR(10) [not null, note: 'Can contain various strings and numbers']
+  "Country" CHAR(3) [not null, note: 'ISO Alpha-3 format with exactly 3 characters, changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Street) >= 2` [name: 'Address_StrLng']
+    `LENGTH(City) >= 2` [name: 'Address_CitLng']
+    `LENGTH(PostalCode) >= 3` [name: 'Address_PstlCd']
+    `UNIQUE(Street, City, HouseNumber, Country` [name: 'Addresses_UnqAddrs']
+  }
+  Note: 'Dimension table storing addresses of users and apartments'
+}
+
+Table "Users" {
+  "UserID" INTEGER [pk, increment, note: 'Surrogate primary key for users']
+  "FirstName" VARCHAR(100) [not null, note: 'Legal first name, changed via ALTER TABLE']
+  "LastName" VARCHAR(100) [not null, note: 'Legal last name, changed via ALTER TABLE']
+  "Email" VARCHAR(254) [unique, not null, note: 'Must contain an @ sign']
+  "PhoneNumber" VARCHAR(30) [unique, note: 'Optional phone number in international phone format, changed via ALTER TABLE']
+  "Password" VARCHAR(32) [not null, note: 'Must contain at least 8 and up to 32 characters']
+  "AddressID" INTEGER [not null, note: 'Foreign key referencing to the Addresses table']
+
+  Checks {
+    `LENGTH(FirstName) >= 2` [name: 'User_FrstLng']
+    `LENGTH(LastName) >= 2` [name: 'User_LstLng']
+    `Email LIKE '%@%'` [name: 'User_Eml']
+    `LENGTH(Password) BETWEEN 8 AND 32` [name: 'User_PwLng']
+  }
+  Note: 'Dimension table storing user data'
+}
+
+Table "Hosts" {
+  "HostID" INTEGER [pk, increment, note: 'Surrogate primary key for hosts']
+  "UserID" INTEGER [not null, note: 'Foreign key referencing to the Users table']
+  Note: 'Dimension table storing host-users'
+
+  Checks {
+    `UNIQUE(UserID)` [name: 'Host_UnqUsrID']
+  }
+}
+
+Table "ApartmentStyles" {
+  "StyleID" INTEGER [pk, increment, note: 'Surrogate primary key for the apartment style']
+  "Style" VARCHAR(50) [unique, not null, note: 'Designation of the style, (e.g., Modern, Scandinavian, ...), changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Style) >= 3` [name: 'ApartmentStyle_Lng']
+  }
+  Note: 'Dimension table storing apartment styles'
+}
+
+Table "ApartmentNeighbourhoods" {
+  "NeighbourhoodID" INTEGER [pk, increment, note: 'Surrogate primary key for the apartments neighbourhood']
+  "Type" VARCHAR(50) [unique, not null, note: 'Designation of the Neighbourhood (e.g., Urban, Financial, ...), changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Type) >= 3` [name: 'Neighbourhood_Lng']
+  }
+  Note: 'Dimension table storing apartment neighbourhood types'
+}
+
+Table "Amenities" {
+  "AmenityID" INTEGER [pk, increment, note: 'Surrogate primary key for amenities']
+  "Amenity" VARCHAR(50) [unique, not null, note: 'Name of the Amenity, (e.g., WiFi, Swimming Pool, ...), changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Amenity) >= 3` [name: 'Amenity_Lng']
+  }
+  Note: 'Dimension table storing amenities'
+}
+
+Table "Apartments" {
+  "ApartmentID" INTEGER [pk, increment, note: 'Surrogate primary key for apartments']
+  "NumberOfBedrooms" INTEGER [not null, note: 'Apartments must contain at least 1 bedroom']
+  "BasePricePerNight" DECIMAL(10,2) [not null, note: 'Base rent for the night']
+  "HostID" INTEGER [not null, note: 'Foreign key referencing to Hosts']
+  "AddressID" INTEGER [not null, note: 'Foreign key referencing to Addresses']
+  "StyleID" INTEGER [note: 'Optional foreign key referencing to ApartmentStyles']
+  "NeighbourhoodID" INTEGER [note: 'Optional foreign key referencing to ApartmentNeighbourhoods']
+
+  Checks {
+    `NumberOfBedrooms BETWEEN 1 AND 10` [name: 'Apartment_NumBdrm']
+    `BasePricePerNight > 0` [name: 'Apartment_BasPrc']
+  }
+  Note: 'Dimension table storing apartment information'
+}
+
+Table "Pictures" {
+  "PictureID" INTEGER [pk, increment, note: 'Surrogate primary key for images']
+  "URL" VARCHAR(768) [unique, not null, note: 'Stores the cloud-url where the picture is stored']
+  "ApartmentID" INTEGER [not null, note: 'Foreign key referencing to Apartments']
+
+  Checks {
+    `URL LIKE 'http://%' OR
+    URL LIKE 'https://%'` [name: 'Picture_Url']
+  }
+  Note: 'Dimension table storing image url locations'
+}
+
+Table "BookingTypes" {
+  "BookingTypeID" INTEGER [pk, increment, note: 'Surrogate primary key for the type of booking']
+  "Type" VARCHAR(50) [unique, not null, note: 'Type of booking (Business Travel, Family Trip, ...), changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Type) >= 3` [name: 'BookingType_Lng']
+  }
+  Note: 'Dimension table storing booking types'
+}
+
+Table "FeeTypes" {
+  "FeeTypeID" INTEGER [pk, increment, note: 'Surrogate primary key for the type of fee']
+  "Type" VARCHAR(50) [unique, not null, note: 'Type of fee (Cleaning, Pets, ...), changed via ALTER TABLE']
+  "Category" FeeTypes_Category_enum [not null, note: 'Distinguishing categories (Platform or Host)']
+
+  Checks {
+    `LENGTH(Type) >= 3` [name: 'FeeType_Lng']
+  }
+  Note: 'Dimension table storing fee types'
+}
+
+Table "PaymentMethods" {
+  "PaymentMethodID" INTEGER [pk, increment, note: 'Surrogate primary key for the payment method']
+  "Method" VARCHAR(50) [unique, not null, note: 'Payment method (Credit Card, PayPal, ...), changed via ALTER TABLE']
+
+  Checks {
+    `LENGTH(Method) >= 2` [name: 'PaymentMethod_Lng']
+  }
+  Note: 'Dimension table storing payment methods'
+}
+
+Table "Bookings" {
+  "BookingID" INTEGER [pk, increment, note: 'Surrogate primary key for the booking']
+  "BookingDate" TIMESTAMP [not null, default: `CURRENT_TIMESTAMP`, note: 'Exact timestamp when the booking was made']
+  "CheckInDate" DATE [not null, note: 'Arrival Date']
+  "CheckOutDate" DATE [not null, note: 'Departure Date']
+  "NumberOfGuests" INTEGER [not null, note: 'Amount of arriving guests']
+  "PricePerNight" DECIMAL(10,2) [not null, note: 'Derived from Apartments.BasePricePerNight']
+  "TotalNights" INTEGER [not null, note: 'Total nights of staying']
+  "BookingTypeID" INTEGER [note: 'Optional foreign key referencing to BookingTypes']
+  "UserID" INTEGER [not null, note: 'Foreign key referencing to Users']
+  "ApartmentID" INTEGER [not null, note: 'Foreign key referencing to Apartments']
+
+  Checks {
+    `BookingDate <= CheckInDate` [name: 'Booking_DateChckIn']
+    `CheckOutDate > CheckInDate` [name: 'Booking_ChkInBefChckOut']
+    `NumberOfGuests >= 1` [name: 'Booking_NrGuests']
+    `PricePerNight > 0` [name: 'Booking_PrcPerNght']
+    `TotalNights >= 1` [name: 'Booking_TtlNghts']
+  }
+  Note: 'Fact table storing booking information'
+}
+
+Table "Payments" {
+  "PaymentID" INTEGER [pk, increment, note: 'Surrogate primary key for the payment']
+  "Receipt" TIMESTAMP [not null, default: `CURRENT_TIMESTAMP`, note: 'Exact timestamp of the payment']
+  "SubTotalAmount" DECIMAL(10,2) [not null, note: 'Base Price of the booking']
+  "ServiceFeeGuest" DECIMAL(10,2) [not null, default: 0, note: 'Total amount of all Platform category fees']
+  "TotalTax" DECIMAL(10,2) [not null, note: 'Total Tax of the SubTotalAmount']
+  "TotalAmount" DECIMAL(10,2) [not null, note: 'Total Amount to be paid']
+  "BookingID" INTEGER [not null, note: 'Foreign key referencing to Bookings']
+  "PaymentMethodID" INTEGER [not null, note: 'Foreign key referencing to PaymentMethods']
+  "InvoiceAddressID" INTEGER [not null, note: 'Foreign key referencing to Addresses']
+
+  Checks {
+    `SubTotalAmount > 0` [name: 'Payment_SubTtlChck']
+    `TotalAmount > 0` [name: 'Payment_TtlAmnt']
+    `ServiceFeeGuest >= 0` [name: 'Payment_SrvcFee']
+    `TotalTax > 0 AND
+    TotalTax < SubTotalAmount` [name: 'Payment_TtlTax']
+    `UNIQUE(BookingID)` [name: 'Payment_UnqPmntPerBkng']
+  }
+  Note: 'Fact table storing payment information'
+}
+
+Table "HostPayouts" {
+  "HostPayoutID" INTEGER [pk, increment, note: 'Surrogate primary key for the HostPayouts']
+  "PaymentDate" TIMESTAMP [not null, note: 'Date when the host is paid -> 24 hours after guests paid']
+  "GrossAmount" DECIMAL(10,2) [not null, note: 'Total Amount to be paid incl. Host type fees']
+  "PlatformCommission" DECIMAL(10,2) [not null, note: '3% commission for the platform']
+  "HostFees" DECIMAL(10,2) [not null, default: 0, note: 'Sum of all Host category feetypes']
+  "NetAmount" DECIMAL(10,2) [not null, note: 'Final amount the host gets paid']
+  "HostShare" DECIMAL(4,3) [not null, note: '70/30 split if the apartment has a Co-Host']
+  "PaidTo" HostPayouts_PaidTo_enum [not null, note: 'Distinguishes between payout to Host or Co-Host']
+  "PaymentID" INTEGER [not null, note: 'Foreign key referencing to Payments']
+  "PayeeID" INTEGER [not null, note: 'Foreign key referencing to Users']
+
+  Checks {
+    `GrossAmount > 0` [name: 'HostPayout_GrssAmnt']
+    `PlatformCommission > 0 AND
+    PlatformCommission < GrossAmount` [name: 'HostPayout_PltfrmComm']
+    `HostFees >= 0` [name: 'HostPayout_HstFee']
+    `NetAmount > 0` [name: 'HostPayout_NtAmnt']
+    `HostShare > 0` [name: 'HostPayout_HstShr']
+    `UNIQUE(PaymentID, PaidTo)` [name: 'HosPayout_UnqPayoutPrBkng']
+  }
+  Note: 'Fact table storing payouts to the host'
+}
+
+Table "FeePayments" {
+  "FeeTypeID" INTEGER [not null, note: 'Compound primary key referencing to FeeTypes']
+  "PaymentID" INTEGER [not null, note: 'Compound primary key referencing to Payments']
+  "Price" DECIMAL(10,2) [not null, note: 'Price of the specific fee']
+
+  Checks {
+    `Price > 0` [name: 'FeePayment_Prc']
+  }
+
+  Indexes {
+    (FeeTypeID, PaymentID) [pk]
+  }
+  Note: 'Fact table storing fee payment information'
+}
+
+Table "Reviews" {
+  "ReviewID" INTEGER [pk, increment, note: 'Surrogate primary key for the reviews']
+  "Rating" TINYINT [not null, note: 'Stars restricted to 0-5']
+  "Comment" VARCHAR(1500) [note: 'Optional comments to the review']
+  "RatingType" Reviews_RatingType_enum [not null, note: 'Distinguishes between Guest and Host rating']
+  "ReviewDate" TIMESTAMP [default: `CURRENT_TIMESTAMP`, note: 'Timestamp when the review is submitted']
+  "UserID" INTEGER [not null, note: 'Foreign key referencing to users']
+  "BookingID" INTEGER [not null, note: 'Foreign key referencing to bookings']
+
+  Checks {
+    `Rating BETWEEN 0 AND 5` [name: 'Review_Rtg']
+    `LENGTH(Comment) > 1` [name: 'Review_Cmnt']
+    `UNIQUE(BookingID, RatingType)` [name: 'Reviews_UnqBkngType'] 
+  }
+  Note: 'Fact table storing reviews'
+}
+
+Table "UserChats" {
+  "ChatID" INTEGER [pk, increment, note: 'Surrogate primary key for the chat']
+  "MessageText" VARCHAR(1500) [not null, note: 'Message related to the chat']
+  "SentAt" TIMESTAMP [default: `CURRENT_TIMESTAMP`, note: 'Timestamp when the message was sent']
+  "SenderID" INTEGER [not null, note: 'Foreign key referencing to Users sending the message']
+  "ReceiverID" INTEGER [not null, note: 'Foreign key referencing to Users receiving the message']
+  "BookingID" INTEGER [note: 'Optional foreign key referencing to Bookings']
+
+  Checks {
+    `LENGTH(MessageText) > 1` [name: 'UserChat_MsgTxt']
+    `SenderID != ReceiverID` [name: 'UserChat_RcvrNotSndr']
+  }
+  Note: 'Fact table storing chat messages'
+}
+
+Table "CustomerSupport" {
+  "TicketID" INTEGER [pk, increment, note: 'Surrogate primary key for the support ticket']
+  "MessageText" VARCHAR(1500) [not null, note: 'Message related to the support ticket']
+  "SentAt" TIMESTAMP [not null, default: `CURRENT_TIMESTAMP`, note: 'Timestamp when the message was sent']
+  "AssigneeID" INTEGER [not null, note: 'Foreign key referencing to Admins']
+  "OpenerID" INTEGER [not null, note: 'Foreign key referencing to Users']
+  "BookingID" INTEGER [note: 'Optional foreign key referencing to Bookings']
+
+  Checks {
+    `LENGTH(MessageText) > 1` [name: 'CustomerSupport_MsgTxt']
+  }
+  Note: 'Fact table storing customer support tickets'
+}
+
+Table "ApartmentAmenities" {
+  "ApartmentID" INTEGER [not null, note: 'Compound primary key referencing to Apartments']
+  "AmenityID" INTEGER [not null, note: 'Compound primary key referencing to Amenities']
+
+  Indexes {
+    (ApartmentID, AmenityID) [pk]
+  }
+  Note: 'Junction table connecting apartments and amenities'
+}
+
+Table "CoHostAssignments" {
+  "CoHostID" INTEGER [not null, note: 'Compound primary key referencing to Users']
+  "ApartmentID" INTEGER [not null, note: 'Compound primary key referencing to Apartments']
+  "AssignmentDate" DATE [not null, default: `CURRENT_DATE`, note: 'Timestamp when the CoHost was assigned to the apartment']
+
+  Indexes {
+    (CoHostID, ApartmentID) [pk]
+  }
+
+  Checks {
+    `UNIQUE(ApartmentID)` [name: 'CoHostAssignments_OneChstPrAprtmnt']
+  }
+  Note: 'Junction table linking cohosts to apartments'
+}
+
+Table "Recommendations" {
+  "RecommendedBy" INTEGER [not null, note: 'Compound primary key referencing to Users recommending the apartment']
+  "RecommendedTo" INTEGER [not null, note: 'Compound primary key referencing to Users getting the apartment recommended']
+  "ApartmentID" INTEGER [not null, note: 'Compound primary key referencing to Apartments']
+
+  Checks {
+    `RecommendedTo != RecommendedBy` [name: 'Recommendation_NotSelf']
+  }
+
+  Indexes {
+    (RecommendedTo, RecommendedBy, ApartmentID) [pk]
+  }
+  Note: 'Junction table storing review information'
+}
+
+Table "Wishlists" {
+  "ApartmentID" INTEGER [not null, note: 'Compound primary key referencing to Apartments']
+  "UserID" INTEGER [not null, note: 'Compound primary key referencing to Users']
+  "AddingDate" DATE [not null, default: `CURRENT_DATE`, note: 'Date when the apartment was added to the wishlist']
+
+  Indexes {
+    (ApartmentID, UserID) [pk]
+  }
+  Note: 'Junction table storing wishlist items'
+}
+
+Ref:"Addresses"."AddressID" <? "Users"."AddressID" [delete: restrict]
+
+Ref:"Users"."UserID" <? "Hosts"."UserID" [delete: restrict]
+
+Ref:"Hosts"."HostID" <? "Apartments"."HostID" [delete: restrict]
+
+Ref:"Addresses"."AddressID" <? "Apartments"."AddressID" [delete: restrict]
+
+Ref:"ApartmentStyles"."StyleID" ?<? "Apartments"."StyleID" [delete: restrict]
+
+Ref:"ApartmentNeighbourhoods"."NeighbourhoodID" ?<? "Apartments"."NeighbourhoodID" [delete: restrict]
+
+Ref:"Apartments"."ApartmentID" <? "Pictures"."ApartmentID" [delete: cascade]
+
+Ref:"BookingTypes"."BookingTypeID" ?<? "Bookings"."BookingTypeID" [delete: restrict]
+
+Ref:"Users"."UserID" <? "Bookings"."UserID" [delete: restrict]
+
+Ref:"Apartments"."ApartmentID" <? "Bookings"."ApartmentID" [delete: restrict]
+
+Ref:"Bookings"."BookingID" <? "Payments"."BookingID" [delete: restrict]
+
+Ref:"PaymentMethods"."PaymentMethodID" <? "Payments"."PaymentMethodID" [delete: restrict]
+
+Ref:"Addresses"."AddressID" <? "Payments"."InvoiceAddressID" [delete: restrict]
+
+Ref:"Payments"."PaymentID" <? "HostPayouts"."PaymentID" [delete: restrict]
+
+Ref:"Users"."UserID" <? "HostPayouts"."PayeeID" [delete: restrict]
+
+Ref:"FeeTypes"."FeeTypeID" <? "FeePayments"."FeeTypeID" [delete: restrict]
+
+Ref:"Payments"."PaymentID" <? "FeePayments"."PaymentID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "Reviews"."UserID" [delete: cascade]
+
+Ref:"Bookings"."BookingID" <? "Reviews"."BookingID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "UserChats"."SenderID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "UserChats"."ReceiverID" [delete: cascade]
+
+Ref:"Bookings"."BookingID" ?<? "UserChats"."BookingID" [delete: cascade]
+
+Ref:"Admins"."AdminID" <? "CustomerSupport"."AssigneeID" [delete: restrict]
+
+Ref:"Users"."UserID" <? "CustomerSupport"."OpenerID" [delete: cascade]
+
+Ref:"Bookings"."BookingID" ?<? "CustomerSupport"."BookingID" [delete: cascade]
+
+Ref:"Apartments"."ApartmentID" <? "ApartmentAmenities"."ApartmentID" [delete: cascade]
+
+Ref:"Amenities"."AmenityID" <? "ApartmentAmenities"."AmenityID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "CoHostAssignments"."CoHostID" [delete: cascade]
+
+Ref:"Apartments"."ApartmentID" <? "CoHostAssignments"."ApartmentID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "Recommendations"."RecommendedBy" [delete: cascade]
+
+Ref:"Users"."UserID" <? "Recommendations"."RecommendedTo" [delete: cascade]
+
+Ref:"Apartments"."ApartmentID" <? "Recommendations"."ApartmentID" [delete: cascade]
+
+Ref:"Apartments"."ApartmentID" <? "Wishlists"."ApartmentID" [delete: cascade]
+
+Ref:"Users"."UserID" <? "Wishlists"."UserID" [delete: cascade]
